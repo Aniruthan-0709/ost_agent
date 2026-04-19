@@ -1,0 +1,284 @@
+
+## SYSTEM ROLE
+
+You are generating a realistic, synthetic enterprise customer dataset to support experimentation with an AI agent that **validates the output of an internal matching process**. The agent takes a pre-computed match result and determines whether that result is correct, incorrect, or needs human review.
+
+This dataset will be used locally for prototyping. You may use real company names and any publicly available data without license restrictions.
+
+---
+
+## BUSINESS CONTEXT
+
+Organizations sell to business customers structured in a four-level hierarchy:
+
+| Level | Description |
+|---|---|
+| **Parent Organization** | Top-level legal or buying entity |
+| **Master Account** | Billing or contracting entity under a Parent |
+| **Site** | Physical location operating under a Master |
+| **Ship-To** | Delivery-only endpoint under a Site. Two Ship-Tos at the same address roll up to the same Site |
+
+---
+
+## VERTICALS
+
+| Code | Name | Includes |
+|---|---|---|
+| **PS** | Public Sector | Government institutions, K-12 schools, government-operated businesses |
+| **HC** | Healthcare | Acute care, non-acute care, assisted living, old age homes |
+| **FS** | Facilities | Commercial and institutional facility management |
+
+---
+
+## EXISTING PROCESS (WHAT THE AGENT IS VALIDATING)
+
+When our team starts a new initiative within a vertical, we source new contacts and customer data from third-party (3P) providers or Group Purchasing Organizations (GPOs) — for example, Northwell GPO for all Northwell-affiliated entities.
+
+This data is run through an **internal matching process** (NLP/fuzzy logic based) that attempts to find whether each incoming record already exists in our internal system. Because this process relies on fuzzy matching, it produces **noisy, unreliable output** — it frequently returns:
+
+- False positives (wrong match surfaced as a match)
+- Mismatched hierarchy (right company, wrong level or location)
+- Plausible-looking but incorrect master relationships
+- Missed matches where the correct record exists but wasn't returned
+
+**The agent's job is to take this process output and verdict each row as correct, incorrect, or ambiguous** — using the matching rules below as its reasoning framework.
+
+**The process produces three data points per record:**
+
+- **(1)** Customer name + address from the incoming 3P/GPO source
+- **(2)** Matched customer name + address returned by the internal process
+- **(3)** The Master account that (2) rolls up to, along with its address
+
+---
+
+## MATCH VALIDATION RULES
+
+A correct match requires **logical alignment**, not just string similarity.
+
+### ✅ Valid Match
+All of the following must be true:
+- (1) and (2) represent the **same organization at the same physical location** — both name and address must align
+- If (2) is a Site or Ship-To, it must have a **valid, recognized parent-child relationship** with Master (3)
+  - Example: A Quill site rolling up under Staples is valid because Staples owns Quill
+
+**Address Variation Rule:**
+- Minor discrepancies (e.g., "St" vs "Street", suite formatting) are **flagged for review but treated as a match** when (2) is a **Master account**
+- For **Sites and Ship-Tos**, address variations require **stricter review** — location is the primary differentiator at these levels
+
+---
+
+### ❌ Not a Match
+Any one of the following disqualifies a match:
+
+| Scenario | Reason |
+|---|---|
+| Different company, different address | No relationship |
+| Different company, same address | Co-location ≠ same entity |
+| Same company name, different address | Name alone is insufficient |
+| Sub-tenant match | e.g., Quest Diagnostics operating *inside* Brigham General Hospital is not the same entity as Brigham General Hospital |
+| Same name, different geography | e.g., "Dept. of Education – MA" vs "Dept. of Education – Kansas City" are distinct legal entities — must never be auto-matched |
+
+---
+
+### 🟡 Greyspace
+Greyspace occurs when the incoming record matches the **right company** but at a **location we do not currently serve**.
+
+**Example:**
+- We have an active account for **Staples – Location 1**
+- The incoming record matches to **Staples – Location 2**
+
+This indicates an existing company relationship but incomplete location coverage. Flagged for **greyspace review** as an expansion opportunity.
+
+> Greyspace also applies when a known subsidiary relationship exists — e.g., an incoming Quill location matched against a different Quill location we currently serve.
+
+---
+
+### ⚪ Whitespace
+*(Out of scope — to be defined separately)*
+
+---
+
+## DATA NOISE REQUIREMENTS
+
+The internal process output (Dataset 3) should reflect **realistic fuzzy/NLP matching errors**:
+
+| Noise Type | Examples |
+|---|---|
+| Non-standard addresses | Abbreviations, misspellings, reordered components |
+| Inconsistent formatting | Mixed casing, extra spaces, punctuation variation |
+| Partial addresses | Missing suite, missing street suffix |
+| Plausible geographic errors | ZIP or city slightly off |
+| Name variation | DBA vs legal name, acronyms, alternate spellings |
+| Deceptive similarity | Similar names, entirely unrelated organizations |
+| Hierarchy errors | Right company, wrong level (Site returned instead of Master) |
+| Relationship errors | Plausible but invalid master rollup |
+
+**GPO records** in Dataset 1 should be noticeably noisier. **3P records** should appear more standardized but still imperfect. Dataset 3 errors should feel like realistic NLP/fuzzy output — not random noise.
+
+---
+
+## DATASETS TO GENERATE
+
+Return **three separate CSVs** at the scale below:
+
+| Dataset | Record Count |
+|---|---|
+| Dataset 1 — Incoming Records | ~30 |
+| Dataset 2 — Internal System Records | ~150 |
+| Dataset 3 — Process Output (to be validated) | 1 row per Dataset 1 record |
+
+---
+
+### DATASET 1 — Incoming Customer Records
+*Sourced from GPOs and 3P partners. Noisy and inconsistent.*
+
+| Field | Notes |
+|---|---|
+| `incoming_id` | Unique identifier |
+| `vertical` | PS / HC / FS |
+| `source_type` | GPO or 3P |
+| `customer_name` | Noisy, inconsistent |
+| `address_line_1` | Required, noisy |
+| `address_line_2` | Nullable |
+| `city` | May contain errors |
+| `state` | May contain errors |
+| `zip_code` | May contain errors |
+| `notes` | Free-text, may contain clues or red herrings |
+
+---
+
+### DATASET 2 — Internal System Records
+*The organization's first-party master data. Structured but enterprise-messy.*
+
+| Field | Notes |
+|---|---|
+| `record_id` | Unique identifier |
+| `hierarchy_level` | Parent / Master / Site / Ship-To |
+| `parent_id` | Links to Parent record |
+| `master_id` | Links to Master record (nullable for top levels) |
+| `entity_name` | Internal name on file |
+| `address_line_1` | |
+| `address_line_2` | Nullable |
+| `city` | |
+| `state` | |
+| `zip_code` | |
+| `vertical` | PS / HC / FS |
+| `is_active` | Boolean |
+
+---
+
+### DATASET 3 — Internal Process Output
+*What the fuzzy/NLP matching process returned. This is what the agent validates. It is intentionally imperfect.*
+
+| Field | Notes |
+|---|---|
+| `incoming_id` | Links to Dataset 1 |
+| `incoming_name` | From Dataset 1 |
+| `incoming_address` | Full address from Dataset 1 |
+| `process_matched_record_id` | Record ID the process returned from Dataset 2 (nullable) |
+| `process_matched_name` | Name of the matched record (nullable) |
+| `process_matched_address` | Address of the matched record (nullable) |
+| `process_matched_master_id` | Master the matched record rolls up to (nullable) |
+| `process_matched_master_name` | Name of that Master (nullable) |
+| `process_matched_master_address` | Address of that Master (nullable) |
+| `process_verdict` | What the process concluded: `MATCH` / `NO_MATCH` / `GREYSPACE` |
+
+---
+
+## AGENT EVALUATION FRAMEWORK
+
+The agent's output will be compared against a **hidden ground truth** to measure performance across two dimensions: **accuracy** and **error detection**.
+
+---
+
+### Agent Output (per row)
+The agent should produce:
+
+| Field | Notes |
+|---|---|
+| `incoming_id` | Links back to Dataset 1 |
+| `agent_verdict` | `CONFIRM_MATCH` / `REJECT_MATCH` / `GREYSPACE` / `NEEDS_REVIEW` |
+| `agent_reasoning` | Plain-English explanation of the agent's determination |
+| `confidence` | HIGH / MEDIUM / LOW |
+
+---
+
+### Hidden Ground Truth (for evaluation only — not fed to agent)
+
+| Field | Notes |
+|---|---|
+| `incoming_id` | |
+| `true_verdict` | `MATCH` / `NO_MATCH` / `GREYSPACE` / `NEEDS_REVIEW` |
+| `true_matched_record_id` | Correct record from Dataset 2 (nullable) |
+| `true_matched_master_id` | Correct Master (nullable) |
+| `error_type` | If process was wrong: `FALSE_POSITIVE` / `FALSE_NEGATIVE` / `WRONG_LEVEL` / `WRONG_LOCATION` / `WRONG_MASTER` / `CORRECT` |
+| `explanation` | Why the process output was right or wrong |
+
+---
+
+### Evaluation Metrics
+
+**Accuracy**
+
+| Metric | Formula | What it measures |
+|---|---|---|
+| Overall Accuracy | Agent correct / Total rows | How often the agent agrees with ground truth |
+| Per-verdict Accuracy | Correct per class / Total per class | Performance on MATCH, NO_MATCH, GREYSPACE separately |
+| Confidence Calibration | HIGH confidence rows that were correct / Total HIGH confidence | Whether HIGH confidence verdicts are actually reliable |
+
+**Error Detection**
+
+| Metric | Formula | What it measures |
+|---|---|---|
+| Precision | True errors caught / All rows agent flagged as wrong | How often the agent is right when it says the process is wrong |
+| Recall | True errors caught / All actual errors in Dataset 3 | How many real process errors the agent successfully caught |
+| F1 Score | 2 × (Precision × Recall) / (Precision + Recall) | Balanced error detection score |
+| False Positive Rate | Agent incorrectly rejected valid matches / Total valid matches | How often the agent rejects something that was actually correct |
+
+**Greyspace Detection**
+
+| Metric | What it measures |
+|---|---|
+| Greyspace Precision | Of rows the agent called GREYSPACE, how many truly were |
+| Greyspace Recall | Of all true GREYSPACE rows, how many did the agent catch |
+
+**Reasoning Quality** *(qualitative, human-reviewed sample)*
+
+| Dimension | What to assess |
+|---|---|
+| Hierarchy awareness | Did the agent correctly reason about Parent / Master / Site / Ship-To relationships? |
+| Geography discrimination | Did the agent correctly reject same-name entities in different geographies? |
+| Co-location traps | Did the agent avoid matching sub-tenants to host organizations? |
+| Address variation handling | Did the agent apply the correct leniency rule (Master vs Site/Ship-To)? |
+
+---
+
+## SCENARIO COVERAGE REQUIREMENTS
+
+| Scenario Type | Count |
+|---|---|
+| Process output is correct — agent should confirm | 8 |
+| Process returned a false positive — agent should reject | 5 |
+| Process returned wrong hierarchy level | 3 |
+| Process returned right company, wrong location (greyspace) | 4 |
+| Same name, different geography — process incorrectly matched | 3 |
+| Co-location / sub-tenant trap | 2 |
+| Address variation on a Master (flag but accept) | 2 |
+| Address variation on a Site/Ship-To (stricter review) | 2 |
+| True whitespace — no match exists, process returned no match correctly | 3 |
+| Ambiguous — agent should return NEEDS_REVIEW | 4 |
+
+---
+
+## OUTPUT INSTRUCTIONS
+
+- Return **four separate CSVs**:
+  - `dataset1_incoming_records.csv`
+  - `dataset2_system_records.csv`
+  - `dataset3_process_output.csv`
+  - `dataset4_ground_truth.csv` *(hidden from agent during testing)*
+- Do **not** include any explanation or commentary outside the CSV output
+- Do **not** make the ground truth obvious from the raw data — the validation challenge must be genuine
+- Dataset 3 errors must feel like **realistic NLP/fuzzy output failures**, not random noise
+- The data must be **difficult for simple fuzzy matching** and require reasoning about hierarchy, geography, and business relationships
+- A human analyst should independently agree with every row in Dataset 4

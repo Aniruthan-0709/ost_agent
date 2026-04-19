@@ -1,0 +1,187 @@
+incoming_id,agent_verdict,agent_reasoning,confidence
+INC-001,CONFIRM_MATCH,"The incoming record ""Northwell Hlth - Lenox Hill Hosp"" at ""100 E 77th St, New York, NY 10075"" matches the matched record ""Northwell Health - Lenox Hill Hospital"" at ""100 East 77th Street, New York, NY 10075"". 
+
+1. NULL CHECK: The matched record is not null - it has both name and address populated.
+
+2. MASTER RELATIONSHIP: Valid. Lenox Hill Hospital is part of the Northwell Health system, and the matched record rolling up to itself as the Master is legitimate.
+
+3. SAME ENTITY: Yes, these are clearly the same entity. ""Northwell Hlth"" is an abbreviation of ""Northwell Health"" and ""Lenox Hill Hosp"" is an abbreviation of ""Lenox Hill Hospital"".
+
+4. ADDRESS CHECK: The addresses are the same physical location. ""100 E 77th St"" is simply an abbreviated form of ""100 East 77th Street"" - same street number, same street name, same city, same state, same ZIP code (10075). The differences are purely formatting (E vs East, St vs Street).
+
+This is a correct match - same company, same address with only minor formatting/abbreviation differences.",HIGH
+INC-002,CONFIRM_MATCH,"The incoming record (Massachusetts General Hospital, 55 Fruit St, Boston, MA 02114) matches the matched record (Massachusetts General Hospital, 55 Fruit Street, Boston, MA 02114) exactly. The only difference is the abbreviation ""St"" vs ""Street"" which is a minor formatting variation, not a meaningful address difference. The Master relationship is valid as Massachusetts General Hospital rolling up to itself as the Master is legitimate. This is the same entity at the same physical location.",HIGH
+INC-003,CONFIRM_MATCH,"The incoming record ""MA Dept of Transportation"" at ""10 Park Plaza, Suite 4160, Boston, MA 02116"" matches the matched record ""MA Department of Transportation"" at the exact same address. The only difference is ""Dept"" vs ""Department"" which is a standard abbreviation variation. The Master relationship is valid - MA Department of Transportation rolling up to itself as the Master is correct. This is clearly the same entity at the same address with only minor formatting differences in the name.",HIGH
+INC-004,CONFIRM_MATCH,"1. NULL CHECK: The matched record has both name and address populated, so this is not a null match scenario.
+
+2. MASTER RELATIONSHIP: JLL (Jones Lang LaSalle) - Chicago HQ is the matched record and also the Master. This is a valid relationship - the site rolls up to itself as the Master, which is legitimate for a headquarters location.
+
+3. SAME ENTITY CHECK: ""Jones Lang LaSalle - Chicago"" and ""JLL - Chicago HQ"" are the same entity. JLL is the well-known abbreviation for Jones Lang LaSalle, a global commercial real estate services company. Both records reference the Chicago location.
+
+4. ADDRESS CHECK: The addresses are identical - ""200 E Randolph St, Chicago, IL 60601"" and ""200 East Randolph Street, Chicago, IL 60601"" represent the same physical location. The differences are purely formatting:
+   - ""E"" vs ""East"" (abbreviation)
+   - ""St"" vs ""Street"" (abbreviation)
+
+This is clearly the same company at the same address. The match is correct.",HIGH
+INC-005,CONFIRM_MATCH,"Step 1 - NULL CHECK: The matched record has both name and address populated, so proceed.
+
+Step 2 - MASTER RELATIONSHIP: LIJ (Long Island Jewish) Oncology Center rolling up to Northwell Health - Long Island Jewish is a valid parent-child relationship. Northwell Health is the parent organization that owns and operates Long Island Jewish Medical Center and its associated oncology services. This is a legitimate real-world relationship.
+
+Step 3 - SAME ENTITY: The incoming ""Northwell - LIJ Oncology Ctr"" and matched ""LIJ - Oncology Center"" are clearly the same entity. Both refer to the Long Island Jewish Oncology Center under Northwell Health. The name variations (abbreviations like ""Ctr"" vs ""Center"", ""LIJ"" in both) represent the same facility.
+
+Step 5 - ADDRESS VARIATION: The addresses are essentially identical:
+- Incoming: 270-05 76th Ave, Building B, New Hyde Park, NY 11040
+- Matched: 270-05 76th Avenue, Building B, New Hyde Park, NY 11040
+
+The only difference is ""Ave"" vs ""Avenue"" which is a standard abbreviation variation. Same street number, same building, same city, state, and ZIP code. This is the same physical location.
+
+This is a correct match - same entity, same address, valid Master relationship.",HIGH
+INC-006,CONFIRM_MATCH,"Step 1 - NULL CHECK: The matched record has valid name and address data, so proceed to validation.
+
+Step 2 - MASTER RELATIONSHIP VALID: ABM Industries is a large facilities services company. The matched record ""ABM - Logan Airport Contract"" legitimately rolls up to ""ABM Industries - Boston Region"" as ABM operates through regional offices managing local contracts. This is a valid parent-child relationship.
+
+Step 3 - SAME ENTITY CHECK: Both records refer to ABM Industries at Logan Airport. The incoming ""ABM Industries - Logan Airport"" and matched ""ABM - Logan Airport Contract"" are clearly the same entity - ABM's operations at Logan Airport.
+
+Step 5 - ADDRESS VARIATION CHECK: The addresses are the same physical location:
+- ""1 Harborside Dr"" vs ""1 Harborside Drive"" - abbreviation difference (Dr vs Drive)
+- ""Ops Center"" is an additional suite/building descriptor, not a different location
+- Same city (East Boston), state (MA), and ZIP (02128)
+
+These are formatting variations, not meaningful geographic differences. The match is correct.",HIGH
+INC-007,REJECT_MATCH,"The incoming record is Aramark Facility Services at 1101 Market St, Philadelphia, PA 19107 - this is Aramark's corporate headquarters. The matched record is Aramark - Boston Region, which is a regional office. While both are part of Aramark, the incoming Philadelphia headquarters location would NOT legitimately roll up to the Boston Region Master. The Philadelphia corporate headquarters would have its own Master record or roll up to a national/corporate Master. This is a case where two locations of the same parent company exist, but the incoming record belongs to a completely separate Master hierarchy (likely the corporate/national level), not the Boston regional Master shown. The master relationship is invalid for this incoming record.",HIGH
+INC-008,REJECT_MATCH,"The incoming record (Mount Sinai Hospital - Main Campus) and matched record (Mount Sinai Hospital) appear to be the same entity at the same address (1 Gustave L Levy Pl / 1 Gustave Levy Place are the same location with minor formatting differences). However, the Master relationship is INVALID.
+
+Mount Sinai Hospital is part of the Mount Sinai Health System, which is a separate and distinct healthcare organization from Northwell Health. Northwell Health is a different major health system headquartered in New Hyde Park, NY. These are two completely independent healthcare systems that operate separately in the New York metropolitan area.
+
+Mount Sinai Hospital should roll up to a Mount Sinai Health System Master, not Northwell Health. The process incorrectly matched this record to a Master with which it has no real-world parent-child relationship.",HIGH
+INC-009,REJECT_MATCH,"The incoming record is Boston City Hall, which is the municipal government building for the City of Boston. The matched record is Boston Public Schools, which is the public school district. While both are government entities within the City of Boston, they are completely different organizations with different functions, different leadership, and different operational structures. Boston City Hall is the seat of city government, while Boston Public Schools is the educational system. These are not the same entity - this is a case of two different city departments/agencies being incorrectly matched. The addresses are also completely different (1 City Hall Plz vs 2300 Washington Street). This is a clear REJECT_MATCH as the process matched to the wrong entity entirely.",HIGH
+INC-010,REJECT_MATCH,"The incoming record is ""Dept of Education - Kansas City USD"" located in Kansas City, MO. This is clearly the Kansas City Unified School District, a local school district in Missouri. The matched record is ""Boston Public Schools"" in Roxbury, MA. These are completely different entities - two separate, independent school districts in different states (Missouri vs Massachusetts). Kansas City USD has no parent-child relationship with Boston Public Schools. They are distinct local government education agencies that operate independently under their own separate organizational structures. This is a clear mismatch - the process incorrectly matched a Kansas City school district to a Boston school district.",HIGH
+INC-011,REJECT_MATCH,"The incoming record is Cushman & Wakefield - NYC at 1290 Ave of the Americas, New York, NY 10104. The matched record is Cushman & Wakefield - Boston at 125 High Street, Boston, MA 02110.
+
+While both records are part of the same parent company (Cushman & Wakefield, a global commercial real estate services firm), the incoming NYC location would NOT legitimately roll up to the Boston Master. Cushman & Wakefield regional offices operate as distinct entities with their own Masters. The NYC office would have its own separate Master account, not roll up under Boston.
+
+This is a case where two locations share the same brand/parent company but operate as separate regional offices with their own distinct Masters. The incoming NYC location should not be matched to or roll up under the Boston Master - it would have its own NYC Master account. This is not a GREYSPACE situation because the NYC office belongs to a completely separate Master of its own.",HIGH
+INC-012,CONFIRM_MATCH,"The matched record name and address are both empty/null (showing as ""nan""). This indicates the internal matching process found no match and returned NO_MATCH as its verdict. According to Step 1 (Null Check), when the matched record name and address are both empty or null, the process found nothing and was correct to do so. Therefore, I confirm the process verdict is correct.",HIGH
+INC-013,CONFIRM_MATCH,"The matched record name and address are both null/nan, indicating the process found no match. Per Step 1 (Null Check), when the matched record name and address are both empty or null, the process found nothing and was correct to do so. The process verdict of NO_MATCH is confirmed as correct.",HIGH
+INC-014,GREYSPACE,"Step 1 - NULL CHECK: The matched record has both name and address populated, so proceeding to validation.
+
+Step 2 - MASTER RELATIONSHIP VALID: Yes. Logan Airport - Terminal B legitimately rolls up to Massport - Logan Airport Operations. Massport (Massachusetts Port Authority) owns and operates Logan International Airport, so Terminal B is a valid child entity under the Massport Logan Airport Operations Master.
+
+Step 3 - SAME ENTITY CHECK: Massport Authority (the incoming record) and Logan Airport - Terminal B (the matched record) are the same organization - Massport operates Logan Airport including all its terminals. The incoming record appears to be for Massport Authority's administrative/headquarters location at Suite 200S, while the matched record is for Terminal B operations. These are the same parent organization (Massport) but at different functional locations within the same campus.
+
+Step 4 - GREYSPACE CHECK: This is GREYSPACE. The incoming record (Massport Authority at Suite 200S - likely administrative offices) and the matched record (Terminal B) are both part of the same unified organization (Massachusetts Port Authority/Massport). Both would legitimately roll up to the same Master (Massport - Logan Airport Operations). The addresses are at the same street (1 Harborside Drive) but represent different functional locations - Suite 200S (administrative) vs Terminal B (airport terminal). This represents an expansion opportunity where Massport Authority's administrative office should be captured as a separate record under the same Master.",HIGH
+INC-015,CONFIRM_MATCH,"This is a correct match. The incoming record ""MA Registry of Motor Vehicles"" at 136 Blackstone St, Boston, MA 02109 matches to ""RMV - Haymarket Location"" at the same address (136 Blackstone Street, Floor 2, Boston, MA 02109). 
+
+1. Master Relationship Valid: RMV - Haymarket Location is a valid child of the MA Registry of Motor Vehicles Master. The Haymarket location is one of the RMV's service locations in Massachusetts, operating under the state's Registry of Motor Vehicles organization.
+
+2. Same Entity: Both records represent the Massachusetts Registry of Motor Vehicles - the matched record is simply the specific site name (Haymarket Location) for this RMV branch.
+
+3. Same Address: The addresses are the same physical location. ""136 Blackstone St"" vs ""136 Blackstone Street, Floor 2"" is just an abbreviation difference (St vs Street) and a floor designation, which are formatting variations at the same address, not different locations.
+
+The match is correct.",HIGH
+INC-016,CONFIRM_MATCH,"The incoming and matched records represent the same entity - City of Boston - Public Works. The addresses are identical except for a minor abbreviation difference (Sq vs Square), which is not a meaningful difference per the Address Variation Check guidelines. The Master relationship is valid: City of Boston - Public Works is a department of Boston City Hall, making it a legitimate parent-child relationship. Both are at the same physical location (1 City Hall Square, Room 714, Boston, MA 02201). The process correctly identified this as a match.",HIGH
+INC-017,REJECT_MATCH,"This is a classic co-location trap. Quest Diagnostics is a separate, independent clinical laboratory company that operates locations inside hospitals. The ""BWH"" in the incoming record name indicates this is a Quest Diagnostics lab located within Brigham and Women's Hospital, but Quest Diagnostics is NOT the same entity as Brigham and Women's Hospital. They are two completely different companies - Quest Diagnostics is a publicly traded diagnostic laboratory company, while Brigham and Women's Hospital is a hospital that is part of the Mass General Brigham health system. Quest Diagnostics simply operates a lab at this hospital location. Different company at the same address = REJECT_MATCH.",HIGH
+INC-018,REJECT_MATCH,"This is a classic co-location trap. The incoming record is ""Sodexo Facilities - MGH"" which represents Sodexo, a major facilities management and food services company, operating at Massachusetts General Hospital. While they share the same physical address (55 Fruit St, Boston, MA 02114), Sodexo is a completely different company from Massachusetts General Hospital. Sodexo is a vendor/contractor providing services INSIDE the hospital - they are not part of MGH's organization. Sodexo has its own corporate Master and should not roll up to Massachusetts General Hospital's Master. Different company at the same address = REJECT_MATCH.",HIGH
+INC-019,REJECT_MATCH,"The incoming record is NewYork-Presbyterian Hospital, and the matched record is NewYork-Presbyterian - Weill Cornell, which appears to be the same entity at the same address (525 E 68th St vs 525 East 68th Street - just formatting differences). However, the Master shown is Northwell Health, which is a completely separate health system. NewYork-Presbyterian is its own independent health system and does NOT roll up to Northwell Health. These are two distinct, competing hospital systems in the New York area. NewYork-Presbyterian would have its own Master organization, not Northwell Health. The Master relationship is invalid, so this match must be rejected.",HIGH
+INC-020,CONFIRM_MATCH,"1. NULL CHECK: The matched record has valid name and address data, so proceeding to further analysis.
+
+2. MASTER RELATIONSHIP CHECK: The matched record (Quill - Boston Fulfillment Center) rolls up to Staples - Framingham HQ. This is a valid relationship because Staples owns Quill. Quill was acquired by Staples and operates as a subsidiary, so rolling up to a Staples Master is legitimate.
+
+3. SAME ENTITY CHECK: The incoming record ""Quill Corp - Boston Fulfillment"" and matched record ""Quill - Boston Fulfillment Center"" are clearly the same entity - both are Quill's Boston fulfillment operations.
+
+4. ADDRESS VARIATION CHECK: The addresses are the same physical location:
+- Incoming: 25 Drydock Ave, Boston, MA 02210
+- Matched: 25 Drydock Avenue, Floor 1, Boston, MA 02210
+
+The differences are:
+- ""Ave"" vs ""Avenue"" - abbreviation difference (not meaningful)
+- Floor 1 designation in matched - unit/floor difference at same street address (not meaningful)
+
+Both are at 25 Drydock Ave/Avenue in Boston, MA 02210, representing the same physical location.
+
+The process verdict of MATCH is correct.",HIGH
+INC-021,REJECT_MATCH,"The incoming record (Northwell Hlth - Syosset Hosp at 221 Jericho Tpke, Syosset, NY 11791) and the matched record (Northwell Health - Forest Hills at 102-01 66th Road, Forest Hills, NY 11375) are both part of the Northwell Health system. However, the Master shown is ""Northwell Health - Forest Hills"" which appears to be a single hospital location, not the parent organization for the entire Northwell Health system.
+
+Northwell Health is a large unified health system in New York, and all its locations would legitimately roll up to a common parent Master (Northwell Health corporate). However, the Syosset Hospital location should not roll up to Forest Hills as its Master - Forest Hills is a peer facility, not a parent. The incoming Syosset Hospital would have its own site-level record or roll up to a Northwell Health corporate Master, not to another individual hospital location within the system.
+
+The Master relationship is invalid - a Northwell hospital site should not roll up to another Northwell hospital site as its Master. This is an incorrect hierarchy assignment.",MEDIUM
+INC-022,GREYSPACE,"The incoming record (ABM Industries - Prudential Ctr at 800 Boylston St, Boston, MA 02199) and the matched record (ABM Industries - Boston Region at 1 Harborside Drive, East Boston, MA 02128) are clearly the same company - ABM Industries, a major facility management and services company.
+
+The Master relationship is valid: ABM Industries is a unified national facility management company, and the Prudential Center location would legitimately roll up to the ABM Industries - Boston Region Master. ABM operates as a unified organization where regional offices manage multiple client sites/locations.
+
+The addresses are genuinely different physical locations:
+- Incoming: 800 Boylston St, Boston (Prudential Center area)
+- Matched: 1 Harborside Drive, East Boston (harbor area)
+
+This is a textbook GREYSPACE case - same company, valid Master relationship, different physical location. The incoming record represents an expansion opportunity where ABM has a site at the Prudential Center that would roll up to the Boston Region Master.",HIGH
+INC-023,REJECT_MATCH,"Both the incoming record (Northwell Health - Glen Cove Hospital) and the matched record (Northwell Health - Lenox Hill Hospital) are part of the Northwell Health system. However, the matched record shows Lenox Hill Hospital as both the matched site AND the Master. This is incorrect - Glen Cove Hospital would not roll up to Lenox Hill Hospital as its Master. Both hospitals are peer facilities within the larger Northwell Health system, meaning they would each have their own Master relationship (or both would roll up to a parent Northwell Health corporate entity). Glen Cove Hospital does not legitimately operate under, is not owned by, or contracted through Lenox Hill Hospital specifically. Lenox Hill Hospital is simply another hospital in the same health system, not a parent entity of Glen Cove Hospital. The incoming record should roll up to a Northwell Health corporate Master, not to Lenox Hill Hospital.",HIGH
+INC-024,CONFIRM_MATCH,"The incoming record ""Dept of Education - Boston Public Schools"" at ""2300 Washington St, Roxbury, MA 02119"" matches the matched record ""Boston Public Schools"" at ""2300 Washington Street, Roxbury, MA 02119"". 
+
+1. NULL CHECK: The matched record has valid name and address data.
+
+2. MASTER RELATIONSHIP: Boston Public Schools rolling up to Boston Public Schools as its own Master is valid - this is a public school district that operates as its own entity.
+
+3. SAME ENTITY: ""Dept of Education - Boston Public Schools"" is clearly the same entity as ""Boston Public Schools"" - it's just a more descriptive name indicating it's part of the Department of Education structure. Boston Public Schools is the school district for the city of Boston.
+
+4. ADDRESS CHECK: The addresses are the same location - ""2300 Washington St"" vs ""2300 Washington Street"" is just an abbreviation difference (St vs Street), and the city (Roxbury), state (MA), and ZIP (02119) all match exactly.
+
+This is a clear match - same entity, same address, valid Master relationship.",HIGH
+INC-025,CONFIRM_MATCH,"Step 1: Both matched record name and address are populated, so this is not a null case.
+
+Step 2: Master Relationship Check - The matched record ""Aramark - Boston Region"" rolls up to itself as the Master. This is a valid self-referential Master relationship. Aramark is a well-known food service and facilities company, and the Boston Region would be a legitimate regional Master entity.
+
+Step 3: Same Entity Check - Both records are clearly Aramark entities at the same address. ""Aramark - Boston Convention Ctr"" appears to be a specific site/facility within the Aramark organization, while ""Aramark - Boston Region"" is the regional Master. This is the same company (Aramark), and the Boston Convention Center site would legitimately roll up to the Boston Region Master.
+
+Step 5: Address Variation Check - The addresses are the same physical location:
+- Incoming: 415 Summer St, Boston, MA 02210
+- Matched: 415 Summer Street, Boston, MA 02210
+The only difference is ""St"" vs ""Street"" which is a standard abbreviation variation, not a meaningful geographic difference.
+
+This is a correct match - the Aramark Boston Convention Center site at 415 Summer Street legitimately rolls up to the Aramark Boston Region Master at the same address.",HIGH
+INC-026,CONFIRM_MATCH,"Step 1 - NULL CHECK: The matched record has both name and address populated, so proceeding to further validation.
+
+Step 2 - MASTER RELATIONSHIP: The matched record ""Cambridge Public Schools - District Admin"" rolls up to itself as Master ""Cambridge Public Schools - District Admin"". This is a valid relationship - the District Admin office is the administrative/contracting entity for Cambridge Public Schools.
+
+Step 3 - SAME ENTITY CHECK: The incoming record ""Cambridge Public Schools - Admin"" and matched record ""Cambridge Public Schools - District Admin"" clearly represent the same entity - Cambridge Public Schools administrative office. The slight name variation (""Admin"" vs ""District Admin"") is just a formatting/abbreviation difference, not a different organization.
+
+Step 5 - ADDRESS VARIATION CHECK: The addresses are the same physical location:
+- Incoming: 159 Broadway, Cambridge, MA 02139
+- Matched: 159 BROADWAY CAMBRIDGE MA 02139
+
+The differences are purely formatting (capitalization, punctuation/comma presence). Same street number, same street name, same city, same state, same ZIP code. This is the same physical location.
+
+Verdict: CONFIRM_MATCH - The process correctly matched the incoming Cambridge Public Schools Admin record to the Cambridge Public Schools District Admin at the same address.",HIGH
+INC-027,CONFIRM_MATCH,"Step 1: The matched record is not null - it contains both name and address.
+
+Step 2: The Master relationship is valid. Tufts Medical Center rolling up to Tufts Medical Center Master is a legitimate real-world relationship - the medical center operates under its own master record.
+
+Step 3: Same entity check - the incoming record ""Tufts Medical Center"" at ""800 Washington St, Boston, MA 02111"" matches the matched record ""Tufts Medical Center"" at ""800 Washington Street Boston MA 02111"". These are clearly the same organization at the same location.
+
+Step 5: Address variation check - the only differences are formatting variations:
+- ""St"" vs ""Street"" (abbreviation)
+- Missing comma between city and state
+- These are not meaningful geographic differences - they represent the same physical location.
+
+The process correctly matched these records. Same company, same address, valid Master relationship.",HIGH
+INC-028,CONFIRM_MATCH,"Step 1 - NULL CHECK: The matched record has both name and address populated, so we proceed.
+
+Step 2 - MASTER RELATIONSHIP: Plainview Hospital - Surgical Center rolling up to Northwell Health - Plainview Hospital is a valid relationship. Northwell Health is a major health system in New York, and Plainview Hospital is part of their network. A surgical center at Plainview Hospital legitimately rolls up to the Northwell Health - Plainview Hospital Master.
+
+Step 3 - SAME ENTITY CHECK: The incoming record ""Northwell - Plainview Hosp"" at 888 Old Country Rd clearly refers to the same facility as the matched ""Plainview Hospital - Surgical Center"" at 888 Old Country Road. Both are at the same street address (888 Old Country Road) in Plainview, NY. The incoming explicitly references Northwell and Plainview Hospital.
+
+Step 5 - ADDRESS VARIATION CHECK: The addresses are essentially the same physical location:
+- ""888 Old Country Rd"" vs ""888 Old Country Road, Suite 100"" - same street address, just with suite detail added
+- ""Plainview, NY 11803"" vs ""Plainview, NY 11804"" - minor ZIP code variation (11803 vs 11804) but these are adjacent ZIP codes in the same Plainview area
+- The suite number indicates a specific unit within the same building
+
+This is the same entity (Northwell's Plainview Hospital) at the same physical location. The match is correct.",HIGH
+INC-029,CONFIRM_MATCH,"The incoming record ""Boston Public Library - Central"" at 700 Boylston St, Boston, MA 02116 matches to ""BPL - Copley Square Branch"" at the same address (700 Boylston Street, Lower Level). 
+
+1. Master Relationship Valid: Yes - The Copley Square Branch is part of the Boston Public Library system, and legitimately rolls up to ""BPL - Central Library"" as its Master. The Central Library and the Copley Square Branch are actually the same building - the main Boston Public Library at Copley Square.
+
+2. Same Entity: Yes - Both records refer to the Boston Public Library system. ""Boston Public Library - Central"" and ""BPL - Copley Square Branch"" are essentially the same location - the main Central Library IS located at Copley Square.
+
+3. Address: Same physical location. The only difference is ""St"" vs ""Street"" (abbreviation) and the addition of ""Lower Level"" which is just a floor/level designation within the same building. These are not meaningful differences per the address variation rules.
+
+The match is correct - both records represent the Boston Public Library's main/central location at 700 Boylston Street in Copley Square, Boston.",HIGH
+INC-030,CONFIRM_MATCH,"The matched record name and address are both null/nan, indicating the internal process found no match and returned NO_MATCH. According to Step 1 (Null Check), when the matched record is empty or null, the process found nothing and was correct to do so. The process verdict of NO_MATCH is correct, so I confirm the match (meaning the process decision was correct).",HIGH

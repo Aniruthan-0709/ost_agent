@@ -1,0 +1,94 @@
+record_id,hierarchy_level,parent_id,master_id,entity_name,address_line_1,address_line_2,city,state,zip_code,vertical,is_active
+SYS-001,Parent,,,Northwell Health,2000 Marcus Avenue,,New Hyde Park,NY,11042,HC,TRUE
+SYS-002,Master,SYS-001,,Northwell Health - Lenox Hill Hospital,100 East 77th Street,,New York,NY,10075,HC,TRUE
+SYS-003,Site,SYS-001,SYS-002,Lenox Hill - Cardiology,100 East 77th Street,Floor 3,New York,NY,10075,HC,TRUE
+SYS-004,Site,SYS-001,SYS-002,Lenox Hill - Emergency Department,100 East 77th Street,Floor 1,New York,NY,10075,HC,TRUE
+SYS-005,Master,SYS-001,,Northwell Health - Long Island Jewish,270-05 76th Avenue,,New Hyde Park,NY,11040,HC,TRUE
+SYS-006,Site,SYS-001,SYS-005,LIJ - Oncology Center,270-05 76th Avenue,Building B,New Hyde Park,NY,11040,HC,TRUE
+SYS-007,Site,SYS-001,SYS-005,LIJ - Pediatrics,270-05 76th Avenue,Building C,New Hyde Park,NY,11040,HC,TRUE
+SYS-008,Master,SYS-001,,Northwell Health - Plainview Hospital,888 Old Country Road,,Plainview,NY,11803,HC,TRUE
+SYS-009,Site,SYS-001,SYS-008,Plainview Hospital - Surgical Center,888 Old Country Road,Suite 100,Plainview,NY,11803,HC,TRUE
+SYS-010,Master,SYS-001,,Northwell Health - Syosset Hospital,221 Jericho Turnpike,,Syosset,NY,11791,HC,TRUE
+SYS-011,Site,SYS-001,SYS-010,Syosset Hospital - Ambulatory Care,221 Jericho Turnpike,Level 2,Syosset,NY,11791,HC,TRUE
+SYS-012,Master,SYS-001,,Northwell Health - Glen Cove Hospital,101 Saint Andrews Lane,,Glen Cove,NY,11542,HC,TRUE
+SYS-013,Site,SYS-001,SYS-012,Glen Cove - Rehabilitation,101 Saint Andrews Lane,Wing B,Glen Cove,NY,11542,HC,TRUE
+SYS-014,Master,SYS-001,,Northwell Health - Forest Hills,102-01 66th Road,,Forest Hills,NY,11375,HC,TRUE
+SYS-015,Parent,,,Partners HealthCare System,800 Boylston Street,Suite 1150,Boston,MA,02199,HC,TRUE
+SYS-016,Master,SYS-015,,Massachusetts General Hospital,55 Fruit Street,,Boston,MA,02114,HC,TRUE
+SYS-017,Site,SYS-015,SYS-016,MGH - Cancer Center,55 Fruit Street,Yawkey Building,Boston,MA,02114,HC,TRUE
+SYS-018,Site,SYS-015,SYS-016,MGH - Wang Ambulatory Care,15 Parkman Street,,Boston,MA,02114,HC,TRUE
+SYS-019,Ship-To,SYS-015,SYS-016,MGH - Central Receiving,55 Fruit Street,Loading Dock B,Boston,MA,02114,HC,TRUE
+SYS-020,Master,SYS-015,,Brigham and Women's Hospital,75 Francis Street,,Boston,MA,02115,HC,TRUE
+SYS-021,Site,SYS-015,SYS-020,BWH - Radiology,75 Francis Street,Floor B2,Boston,MA,02115,HC,TRUE
+SYS-022,Site,SYS-015,SYS-020,BWH - Ambulatory Surgery,75 Francis Street,Floor 4,Boston,MA,02115,HC,TRUE
+SYS-023,Parent,,,Boston Children's Hospital,300 Longwood Avenue,,Boston,MA,02115,HC,TRUE
+SYS-024,Master,SYS-023,,Boston Children's Hospital - Main,300 Longwood Avenue,,Boston,MA,02115,HC,TRUE
+SYS-025,Site,SYS-023,SYS-024,BCH - Surgical Services,300 Longwood Avenue,Floor 6,Boston,MA,02115,HC,TRUE
+SYS-026,Site,SYS-023,SYS-024,BCH - Emergency Department,300 Longwood Avenue,Floor 1,Boston,MA,02115,HC,TRUE
+SYS-027,Parent,,,Tufts Medicine,800 Washington Street,,Boston,MA,02111,HC,TRUE
+SYS-028,Master,SYS-027,,Tufts Medical Center,800 Washington Street,,Boston,MA,02111,HC,TRUE
+SYS-029,Site,SYS-027,SYS-028,Tufts MC - Cardiovascular Center,800 Washington Street,Suite 300,Boston,MA,02111,HC,TRUE
+SYS-030,Parent,,,Mount Sinai Health System,1 Gustave Levy Place,,New York,NY,10029,HC,TRUE
+SYS-031,Master,SYS-030,,Mount Sinai Hospital,1 Gustave Levy Place,,New York,NY,10029,HC,TRUE
+SYS-032,Site,SYS-030,SYS-031,Mount Sinai - Cardiac ICU,1 Gustave Levy Place,Floor 4,New York,NY,10029,HC,TRUE
+SYS-033,Parent,,,NewYork-Presbyterian,525 East 68th Street,,New York,NY,10065,HC,TRUE
+SYS-034,Master,SYS-033,,NewYork-Presbyterian - Weill Cornell,525 East 68th Street,,New York,NY,10065,HC,TRUE
+SYS-035,Site,SYS-033,SYS-034,NYP-Weill Cornell - Neurology,525 East 68th Street,Starr Pavilion,New York,NY,10065,HC,TRUE
+SYS-036,Master,SYS-033,,NewYork-Presbyterian - Columbia,622 West 168th Street,,New York,NY,10032,HC,TRUE
+SYS-037,Parent,,,Quest Diagnostics,500 Plaza Drive,,Secaucus,NJ,07094,HC,TRUE
+SYS-038,Master,SYS-037,,Quest Diagnostics - Boston Region,100 First Avenue,Suite 100,Charlestown,MA,02129,HC,TRUE
+SYS-039,Site,SYS-037,SYS-038,Quest Diagnostics - BWH In-House Lab,75 Francis Street,Level B3,Boston,MA,02115,HC,TRUE
+SYS-040,Parent,,,Sodexo USA,9801 Washingtonian Boulevard,,Gaithersburg,MD,20878,FS,TRUE
+SYS-041,Master,SYS-040,,Sodexo - Boston Healthcare,55 Fruit Street,Suite 100,Boston,MA,02114,FS,TRUE
+SYS-042,Site,SYS-040,SYS-041,Sodexo - MGH Food Services,55 Fruit Street,Basement Level,Boston,MA,02114,FS,TRUE
+SYS-043,Site,SYS-040,SYS-041,Sodexo - BWH Environmental Services,75 Francis Street,Lower Level,Boston,MA,02115,FS,TRUE
+SYS-044,Parent,,,ABM Industries,One Liberty Plaza,,New York,NY,10006,FS,TRUE
+SYS-045,Master,SYS-044,,ABM Industries - Boston Region,1 Harborside Drive,,East Boston,MA,02128,FS,TRUE
+SYS-046,Site,SYS-044,SYS-045,ABM - Logan Airport Contract,1 Harborside Drive,Ops Center,East Boston,MA,02128,FS,TRUE
+SYS-047,Site,SYS-044,SYS-045,ABM - Prudential Center,800 Boylston Street,,Boston,MA,02199,FS,TRUE
+SYS-048,Site,SYS-044,SYS-045,ABM - South Station,700 Atlantic Avenue,,Boston,MA,02110,FS,FALSE
+SYS-049,Parent,,,Aramark Corporation,1101 Market Street,,Philadelphia,PA,19107,FS,TRUE
+SYS-050,Master,SYS-049,,Aramark - Corporate HQ,1101 Market Street,,Philadelphia,PA,19107,FS,TRUE
+SYS-051,Master,SYS-049,,Aramark - Boston Region,415 Summer Street,,Boston,MA,02210,FS,TRUE
+SYS-052,Site,SYS-049,SYS-051,Aramark - Boston Convention Center,415 Summer Street,,Boston,MA,02210,FS,TRUE
+SYS-053,Site,SYS-049,SYS-051,Aramark - MGH Dining Services,55 Fruit Street,Cafeteria Level,Boston,MA,02114,FS,TRUE
+SYS-054,Parent,,,CBRE Group,400 South Hope Street,,Los Angeles,CA,90071,FS,TRUE
+SYS-055,Master,SYS-054,,CBRE - Boston Office,200 State Street,Floor 5,Boston,MA,02109,FS,TRUE
+SYS-056,Site,SYS-054,SYS-055,CBRE - Boston Portfolio Management,200 State Street,Floor 6,Boston,MA,02109,FS,TRUE
+SYS-057,Parent,,,Jones Lang LaSalle,200 East Randolph Street,,Chicago,IL,60601,FS,TRUE
+SYS-058,Master,SYS-057,,JLL - Chicago HQ,200 East Randolph Street,,Chicago,IL,60601,FS,TRUE
+SYS-059,Site,SYS-057,SYS-058,JLL - Chicago Downtown Portfolio,200 East Randolph Street,Suite 3000,Chicago,IL,60601,FS,TRUE
+SYS-060,Master,SYS-057,,JLL - Boston Office,53 State Street,,Boston,MA,02109,FS,TRUE
+SYS-061,Site,SYS-057,SYS-060,JLL - Boston Life Sciences,53 State Street,Floor 12,Boston,MA,02109,FS,TRUE
+SYS-062,Parent,,,Cushman & Wakefield,225 West Wacker Drive,,Chicago,IL,60606,FS,TRUE
+SYS-063,Master,SYS-062,,Cushman & Wakefield - NYC,1290 Avenue of the Americas,,New York,NY,10104,FS,TRUE
+SYS-064,Site,SYS-062,SYS-063,CW - Midtown Manhattan Portfolio,1290 Avenue of the Americas,Suite 3000,New York,NY,10104,FS,TRUE
+SYS-065,Master,SYS-062,,Cushman & Wakefield - Boston,125 High Street,,Boston,MA,02110,FS,TRUE
+SYS-066,Parent,,,Staples Inc,500 Staples Drive,,Framingham,MA,01702,FS,TRUE
+SYS-067,Master,SYS-066,,Staples - Framingham HQ,500 Staples Drive,,Framingham,MA,01702,FS,TRUE
+SYS-068,Parent,,,Quill Corporation,100 Schelter Road,,Lincolnshire,IL,60069,FS,TRUE
+SYS-069,Master,SYS-068,,Quill - Lincolnshire HQ,100 Schelter Road,,Lincolnshire,IL,60069,FS,TRUE
+SYS-070,Master,SYS-068,,Quill - Boston Fulfillment,25 Drydock Avenue,,Boston,MA,02210,FS,TRUE
+SYS-071,Site,SYS-068,SYS-070,Quill - Boston Fulfillment Center,25 Drydock Avenue,Floor 1,Boston,MA,02210,FS,TRUE
+SYS-072,Parent,,,Commonwealth of Massachusetts,1 Ashburton Place,,Boston,MA,02108,PS,TRUE
+SYS-073,Master,SYS-072,,MA Department of Transportation,10 Park Plaza,Suite 4160,Boston,MA,02116,PS,TRUE
+SYS-074,Site,SYS-072,SYS-073,MassDOT - Highway Division,10 Park Plaza,Suite 3170,Boston,MA,02116,PS,TRUE
+SYS-075,Master,SYS-072,,MA Registry of Motor Vehicles,136 Blackstone Street,,Boston,MA,02109,PS,TRUE
+SYS-076,Site,SYS-072,SYS-075,RMV - Haymarket Location,136 Blackstone Street,Floor 2,Boston,MA,02109,PS,TRUE
+SYS-077,Parent,,,City of Boston,1 City Hall Square,,Boston,MA,02201,PS,TRUE
+SYS-078,Master,SYS-077,,Boston City Hall,1 City Hall Square,,Boston,MA,02201,PS,TRUE
+SYS-079,Site,SYS-077,SYS-078,City of Boston - Public Works,1 City Hall Square,Room 714,Boston,MA,02201,PS,TRUE
+SYS-080,Master,SYS-077,,Boston Public Schools,2300 Washington Street,,Roxbury,MA,02119,PS,TRUE
+SYS-081,Parent,,,Cambridge Public Schools,159 Broadway,,Cambridge,MA,02139,PS,TRUE
+SYS-082,Master,SYS-081,,Cambridge Public Schools - District Admin,159 Broadway,,Cambridge,MA,02139,PS,TRUE
+SYS-083,Site,SYS-081,SYS-082,Cambridge Rindge and Latin School,459 Broadway,,Cambridge,MA,02138,PS,TRUE
+SYS-084,Parent,,,Kansas City USD 500,1211 McGee Street,,Kansas City,MO,64106,PS,TRUE
+SYS-085,Master,SYS-084,,Kansas City USD 500 - Central Admin,1211 McGee Street,,Kansas City,MO,64106,PS,TRUE
+SYS-086,Parent,,,Massport,1 Harborside Drive,Suite 200S,East Boston,MA,02128,PS,TRUE
+SYS-087,Master,SYS-086,,Massport - Logan Airport Operations,1 Harborside Drive,Suite 200S,East Boston,MA,02128,PS,TRUE
+SYS-088,Site,SYS-086,SYS-087,Logan Airport - Terminal B,1 Harborside Drive,Terminal B,East Boston,MA,02128,PS,TRUE
+SYS-089,Site,SYS-086,SYS-087,Logan Airport - Terminal E,1 Harborside Drive,Terminal E,East Boston,MA,02128,PS,TRUE
+SYS-090,Parent,,,Boston Public Library,700 Boylston Street,,Boston,MA,02116,PS,TRUE
+SYS-091,Master,SYS-090,,BPL - Central Library,700 Boylston Street,,Boston,MA,02116,PS,TRUE
+SYS-092,Site,SYS-090,SYS-091,BPL - Copley Square Branch,700 Boylston Street,Lower Level,Boston,MA,02116,PS,TRUE
+SYS-093,Site,SYS-090,SYS-091,BPL - Jamaica Plain Branch,30 South Street,,Jamaica Plain,MA,02130,PS,TRUE

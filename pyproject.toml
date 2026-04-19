@@ -1,0 +1,11 @@
+[project]
+name = "staples-agent-experimentation"
+version = "0.1.0"
+description = "agent that verifies matched records"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "anthropic>=0.96.0",
+    "pandas>=3.0.2",
+    "python-dotenv>=1.2.2",
+]
