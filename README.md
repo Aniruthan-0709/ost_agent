@@ -59,11 +59,14 @@ For every record the agent receives, it works through five steps in order:
 
 | Metric | Score |
 |---|---|
-| Overall Accuracy | 85% (23/27 active rows) |
-| Correct Match Detection | 100% |
-| False Positive Rejection | 100% |
-| Greyspace Detection | 67% |
+| Overall Accuracy | 96% (26/27 active rows) |
+| Correct Match Detection | 100% (13/13) |
+| False Positive Rejection | 100% (4/4) |
+| No Match Review Routing | 100% precision / 100% recall |
+| Greyspace Detection | 100% precision / 67% recall |
 | Error Detection F1 | 90% |
+
+**Only miss:** INC-021 (Northwell Syosset Hospital) — agent correctly identified both records as Northwell but called `NO_MATCH` instead of `GREYSPACE` because it determined sibling facilities cannot share a Master. Prompt refinement in progress.
 
 *3 rows excluded — hierarchy-level scenarios outside this agent's scope.*
 
