@@ -13,8 +13,8 @@ SCENARIO_MAP = {
     "INC-009": "false_positive",
     "INC-010": "false_positive",
     "INC-011": "false_positive",
-    "INC-012": "false_negative",
-    "INC-013": "false_negative",
+    "INC-012": "no_match_review",   # was: false_negative
+    "INC-013": "no_match_review",   # was: false_negative
     "INC-014": "excluded",
     "INC-015": "excluded",
     "INC-016": "correct_match",
@@ -31,26 +31,31 @@ SCENARIO_MAP = {
     "INC-027": "correct_match",
     "INC-028": "correct_match",
     "INC-029": "correct_match",
-    "INC-030": "whitespace",
+    "INC-030": "no_match_review",   # was: whitespace
 }
 
 SCENARIO_LABELS = {
-    "correct_match":                 "✅ Correct Match — agent should confirm",
-    "false_positive":                "❌ False Positive — agent should reject",
-    "false_negative":                "❌ False Negative — process missed a match",
-    "greyspace_wrong_location":      "🟡 Greyspace — right company, wrong location",
-    "colocation_subtenant":          "🏢 Co-location / Sub-tenant Trap",
-    "wrong_master":                  "🔗 Wrong Master Relationship",
-    "whitespace":                    "⬜ Whitespace — correct NO_MATCH",
-    "excluded":                      "⏭️  Excluded — not a real-world scenario",
+    "correct_match":           "✅ Correct Match — agent should confirm",
+    "false_positive":          "❌ False Positive — agent should reject",
+    "no_match_review":         "🔍 No Match Review — process returned null; route to human",
+    "greyspace_wrong_location":"🟡 Greyspace — right company, wrong location",
+    "colocation_subtenant":    "🏢 Co-location / Sub-tenant Trap",
+    "wrong_master":            "🔗 Wrong Master Relationship",
+    "excluded":                "⏭️  Excluded — not a real-world scenario",
 }
 
+# Agent verdict → normalized label for comparison against ground truth
 VERDICT_MAP = {
-    "CONFIRM_MATCH": "MATCH",
-    "REJECT_MATCH":  "NO_MATCH",
-    "GREYSPACE":     "GREYSPACE",
-    "NEEDS_REVIEW":  "NEEDS_REVIEW",
+    "CONFIRM_MATCH":   "MATCH",
+    "REJECT_MATCH":    "NO_MATCH",
+    "GREYSPACE":       "GREYSPACE",
+    "NEEDS_REVIEW":    "NEEDS_REVIEW",
+    "NO_MATCH_REVIEW": "NO_MATCH_REVIEW",
 }
+
+# Ground truth true_verdict values for no_match_review rows
+NO_MATCH_REVIEW_VERDICTS = {"NO_MATCH_REVIEW"}
+
 
 def evaluate():
     results      = pd.read_csv("output/results.csv")
@@ -60,38 +65,53 @@ def evaluate():
     df = results.merge(ground_truth, on="incoming_id")
     df = df.merge(d3[["incoming_id", "incoming_name", "process_verdict"]], on="incoming_id")
 
-    df["scenario"]                = df["incoming_id"].map(SCENARIO_MAP)
+    df["scenario"]               = df["incoming_id"].map(SCENARIO_MAP)
     df["agent_verdict_normalized"] = df["agent_verdict"].map(VERDICT_MAP)
-    df["correct"]                 = df["agent_verdict_normalized"] == df["true_verdict"]
+    df["correct"]                = df["agent_verdict_normalized"] == df["true_verdict"]
 
     # Split excluded vs active rows
     excluded = df[df["scenario"] == "excluded"]
     active   = df[df["scenario"] != "excluded"]
 
-    # ── Overall Accuracy (active rows only) ──────────────────────────────────
+    # ── Overall Accuracy (active rows only) ──────────────────────────────
     overall = active["correct"].mean()
     print(f"\n{'='*60}")
-    print(f"  OVERALL ACCURACY: {overall:.0%}  ({active['correct'].sum()}/{len(active)} rows)")
-    print(f"  (Excluded {len(excluded)} rows — hierarchy level scenarios not applicable)")
+    print(f" OVERALL ACCURACY: {overall:.0%} ({active['correct'].sum()}/{len(active)} rows)")
+    print(f" (Excluded {len(excluded)} rows — hierarchy level scenarios not applicable)")
     print(f"{'='*60}")
 
-    # ── Per Verdict Accuracy ──────────────────────────────────────────────────
+    # ── Per Verdict Accuracy ──────────────────────────────────────────────
     print("\nPER VERDICT ACCURACY:")
-    for verdict in ["MATCH", "NO_MATCH", "GREYSPACE", "NEEDS_REVIEW"]:
+    for verdict in ["MATCH", "NO_MATCH", "GREYSPACE", "NEEDS_REVIEW", "NO_MATCH_REVIEW"]:
         subset = active[active["true_verdict"] == verdict]
         if len(subset) > 0:
             acc = subset["correct"].mean()
-            print(f"  {verdict:<15} {acc:.0%}  ({subset['correct'].sum()}/{len(subset)})")
+            print(f"  {verdict:<18} {acc:.0%} ({subset['correct'].sum()}/{len(subset)})")
 
-    # ── Confidence Calibration ────────────────────────────────────────────────
+    # ── Confidence Calibration ────────────────────────────────────────────
     print("\nCONFIDENCE CALIBRATION:")
     for conf in ["HIGH", "MEDIUM", "LOW"]:
         subset = active[active["confidence"] == conf]
         if len(subset) > 0:
             acc = subset["correct"].mean()
-            print(f"  {conf:<8} {acc:.0%}  ({subset['correct'].sum()}/{len(subset)} correct)")
+            print(f"  {conf:<8} {acc:.0%} ({subset['correct'].sum()}/{len(subset)} correct)")
 
-    # ── Error Detection ───────────────────────────────────────────────────────
+    # ── No Match Review Detection ─────────────────────────────────────────
+    nmr_true      = active["true_verdict"].isin(NO_MATCH_REVIEW_VERDICTS)
+    nmr_predicted = active["agent_verdict"] == "NO_MATCH_REVIEW"
+
+    nmr_tp = (nmr_predicted & nmr_true).sum()
+    nmr_fp = (nmr_predicted & ~nmr_true).sum()
+    nmr_fn = (~nmr_predicted & nmr_true).sum()
+
+    nmr_precision = nmr_tp / (nmr_tp + nmr_fp) if (nmr_tp + nmr_fp) > 0 else 0
+    nmr_recall    = nmr_tp / (nmr_tp + nmr_fn) if (nmr_tp + nmr_fn) > 0 else 0
+
+    print(f"\nNO MATCH REVIEW ROUTING:")
+    print(f"  Precision : {nmr_precision:.0%}  (of rows routed to review, how many truly needed it)")
+    print(f"  Recall    : {nmr_recall:.0%}  (of all null-match rows, how many were correctly routed)")
+
+    # ── Error Detection ───────────────────────────────────────────────────
     actual_errors = active["error_type"] != "CORRECT"
     agent_flagged = active["agent_verdict"].isin(["REJECT_MATCH", "NEEDS_REVIEW"])
 
@@ -103,31 +123,35 @@ def evaluate():
     recall    = tp / (tp + fn) if (tp + fn) > 0 else 0
     f1        = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
 
-    print(f"\nERROR DETECTION:")
+    print(f"\nERROR DETECTION (false positives & wrong masters):")
     print(f"  Precision : {precision:.0%}  (when agent flags error, how often it is right)")
     print(f"  Recall    : {recall:.0%}  (of all real errors, how many agent caught)")
     print(f"  F1 Score  : {f1:.0%}")
 
-    # ── Greyspace Detection ───────────────────────────────────────────────────
+    # ── Greyspace Detection ───────────────────────────────────────────────
     gs_true      = active["true_verdict"] == "GREYSPACE"
     gs_predicted = active["agent_verdict"] == "GREYSPACE"
+
     gs_tp = (gs_predicted & gs_true).sum()
     gs_fp = (gs_predicted & ~gs_true).sum()
     gs_fn = (~gs_predicted & gs_true).sum()
+
     gs_precision = gs_tp / (gs_tp + gs_fp) if (gs_tp + gs_fp) > 0 else 0
     gs_recall    = gs_tp / (gs_tp + gs_fn) if (gs_tp + gs_fn) > 0 else 0
+
     print(f"\nGREYSPACE DETECTION:")
     print(f"  Precision : {gs_precision:.0%}")
     print(f"  Recall    : {gs_recall:.0%}")
 
-    # ── Scenario Breakdown ────────────────────────────────────────────────────
+    # ── Scenario Breakdown ────────────────────────────────────────────────
     print(f"\n{'='*60}")
-    print("  SCENARIO-BY-SCENARIO BREAKDOWN")
+    print(" SCENARIO-BY-SCENARIO BREAKDOWN")
     print(f"{'='*60}")
 
     for scenario_key, scenario_label in SCENARIO_LABELS.items():
         if scenario_key == "excluded":
             continue
+
         subset = active[active["scenario"] == scenario_key]
         if subset.empty:
             continue
@@ -138,26 +162,31 @@ def evaluate():
 
         print(f"\n{scenario_label}")
         print(f"  Accuracy: {acc:.0%} ({correct_count}/{total_count})")
-        print(f"  {'ID':<10} {'Entity':<35} {'True':<15} {'Agent':<15} {'Conf':<8} {'OK'}")
-        print(f"  {'-'*90}")
+        print(f"  {'ID':<10} {'Entity':<35} {'True':<18} {'Agent':<18} {'Conf':<8} {'OK'}")
+        print(f"  {'-'*95}")
 
         for _, row in subset.iterrows():
             ok     = "✓" if row["correct"] else "✗"
             entity = str(row["incoming_name"])[:33]
-            print(f"  {row['incoming_id']:<10} {entity:<35} {row['true_verdict']:<15} {row['agent_verdict_normalized']:<15} {row['confidence']:<8} {ok}")
-
+            print(
+                f"  {row['incoming_id']:<10} {entity:<35} "
+                f"{row['true_verdict']:<18} {row['agent_verdict_normalized']:<18} "
+                f"{row['confidence']:<8} {ok}"
+            )
             if not row["correct"]:
                 print(f"\n    WHY IT FAILED:")
                 print(f"    Ground truth : {str(row['explanation'])[:120]}...")
                 print(f"    Agent said   : {str(row['agent_reasoning'])[:120]}...")
-                print()
 
-    # ── Misses Summary ────────────────────────────────────────────────────────
+        print()
+
+    # ── Misses Summary ────────────────────────────────────────────────────
     misses = active[~active["correct"]]
     if len(misses) > 0:
         print(f"\n{'='*60}")
-        print(f"  SUMMARY OF MISSES ({len(misses)} rows)")
+        print(f" SUMMARY OF MISSES ({len(misses)} rows)")
         print(f"{'='*60}")
+
         for _, row in misses.iterrows():
             print(f"\n  {row['incoming_id']} — {row['incoming_name']}")
             print(f"  Scenario : {SCENARIO_LABELS.get(row['scenario'], row['scenario'])}")
@@ -165,13 +194,14 @@ def evaluate():
             print(f"  Got      : {row['agent_verdict_normalized']} (confidence: {row['confidence']})")
             print(f"  Reason   : {str(row['agent_reasoning'])[:150]}...")
 
-    # ── Excluded rows summary ─────────────────────────────────────────────────
+    # ── Excluded rows summary ─────────────────────────────────────────────
     if len(excluded) > 0:
         print(f"\n{'='*60}")
-        print(f"  EXCLUDED ROWS ({len(excluded)} — hierarchy level scenarios)")
+        print(f" EXCLUDED ROWS ({len(excluded)} — hierarchy level scenarios)")
         print(f"{'='*60}")
         for _, row in excluded.iterrows():
             print(f"  {row['incoming_id']} — {row['incoming_name']} — agent said: {row['agent_verdict_normalized']}")
+
 
 if __name__ == "__main__":
     evaluate()

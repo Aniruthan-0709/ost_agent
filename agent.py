@@ -9,21 +9,23 @@ load_dotenv()
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+
 def format_record(record):
     return f"""
 INCOMING RECORD:
-  Name:    {record['incoming_name']}
-  Address: {record['incoming_address']}
+Name: {record['incoming_name']}
+Address: {record['incoming_address']}
 
 MATCHED RECORD (process output):
-  Name:    {record['process_matched_name'] or 'None'}
-  Address: {record['process_matched_address'] or 'None'}
-  Process Verdict: {record['process_verdict']}
+Name: {record['process_matched_name'] or 'None'}
+Address: {record['process_matched_address'] or 'None'}
+Process Verdict: {record['process_verdict']}
 
 MASTER:
-  Name:    {record['process_matched_master_name'] or 'None'}
-  Address: {record['process_matched_master_address'] or 'None'}
+Name: {record['process_matched_master_name'] or 'None'}
+Address: {record['process_matched_master_address'] or 'None'}
 """
+
 
 def validate_record(record):
     message = client.messages.create(
@@ -44,16 +46,20 @@ def validate_record(record):
                 **block.input
             }
 
+
 if __name__ == "__main__":
-    records = load_d3()
-    results = []
+    records, bypassed = load_d3()
+
+    print(f"Records for agent  : {len(records)}")
+    print(f"Bypassed (NO_MATCH_REVIEW): {len(bypassed)}")
+
+    results = list(bypassed)  # start with pre-filtered rows
 
     for i, record in enumerate(records):
-        print(f"Processing {record['incoming_id']} ({i+1}/{len(records)})...")
+        print(f"Processing {record['incoming_id']} ({i + 1}/{len(records)})...")
         result = validate_record(record)
         results.append(result)
 
-    # Write to output folder
     os.makedirs("output", exist_ok=True)
     df = pd.DataFrame(results)
     df.to_csv("output/results.csv", index=False)
